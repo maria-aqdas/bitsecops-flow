@@ -3,352 +3,291 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BitSecOps Flow | AI Developer Security Workflow</title>
+  <title>CutoverLens | Autonomous Release Readiness Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"Fira Code"', 'monospace'],
           },
           colors: {
-            base: '#0B0E14',
-            panel: '#101520',
-            panelHover: '#161C2B',
-            borderSubtle: '#1C2436',
-            brand: '#7C3AED',
-            brandGlow: 'rgba(124, 58, 237, 0.25)',
-            accentBtc: '#F7931A',
+            night: '#06090E',
+            surface: '#0D131C',
+            surfaceLight: '#141D2B',
+            line: '#202D42',
+            emeraldAccent: '#10B981',
+            cyanGlow: '#06B6D4',
+            crimson: '#F43F5E',
+            amberAlert: '#F59E0B'
           }
         }
       }
     }
   </script>
   <style>
-    body { background-color: #0B0E14; color: #F3F4F6; }
-    .glow-purple { box-shadow: 0 0 35px rgba(124, 58, 237, 0.2); }
+    body { background-color: #06090E; color: #E2E8F0; }
+    .glow-box { box-shadow: 0 0 25px rgba(6, 182, 212, 0.15); }
     .glow-dot { box-shadow: 0 0 10px #10B981; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row antialiased">
+<body class="min-h-screen flex flex-col font-sans">
 
-  <!-- LEFT SIDEBAR -->
-  <aside class="w-full md:w-64 border-r border-borderSubtle bg-panel p-5 flex flex-col justify-between shrink-0">
-    <div class="space-y-8">
-      <!-- Brand Header -->
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand to-indigo-500 flex items-center justify-center font-extrabold text-xl shadow-lg glow-purple">
-          ₿
-        </div>
-        <div>
-          <h2 class="font-bold text-base text-white tracking-tight">BitSecOps Flow</h2>
-          <p class="text-xs text-slate-400">AI Developer Workflow</p>
-        </div>
+  <!-- TOP HEADER / NAV -->
+  <header class="border-b border-line bg-surface/80 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center font-mono font-bold text-night text-xl shadow-lg">
+        ⎈
       </div>
-
-      <!-- Navigation Tabs -->
-      <nav class="space-y-1">
-        <button onclick="switchTab('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-semibold bg-brand text-white shadow-md transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-          Overview
-        </button>
-        <button onclick="switchTab('pipeline')" id="nav-pipeline" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-panelHover transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-          SecOps Flow
-        </button>
-        <button onclick="switchTab('findings')" id="nav-findings" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-panelHover transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-          Risk Findings
-        </button>
-        <button onclick="switchTab('review')" id="nav-review" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-panelHover transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Code Review
-        </button>
-        <button onclick="switchTab('reports')" id="nav-reports" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-panelHover transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          Reports
-        </button>
-      </nav>
-    </div>
-
-    <!-- Active Agent Status -->
-    <div class="p-3.5 rounded-xl border border-borderSubtle bg-base flex items-center gap-3">
-      <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 glow-dot"></span>
       <div>
-        <p class="text-xs font-bold text-white">Bob 2.0 Agent</p>
-        <p class="text-[11px] text-slate-400">Workflow Active</p>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN VIEWPORT -->
-  <main class="flex-1 p-6 md:p-10 space-y-8 overflow-y-auto">
-    
-    <!-- Top Action Bar -->
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div>
-        <span class="text-xs uppercase tracking-wider font-semibold text-brand">AI-Assisted Bitcoin Security</span>
-        <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Security Command Center</h1>
-      </div>
-      <div class="flex items-center gap-3">
-        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-panel border border-borderSubtle text-slate-300">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> LIVE SESSION
-        </span>
-        <button onclick="startSecOpsFlow()" id="startBtn" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-brand hover:bg-purple-600 font-bold text-sm text-white shadow-lg glow-purple transition">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M4.5 3.5v13l11-6.5-11-6.5z"/></svg>
-          ▶ Start SecOpsFlow
-        </button>
-      </div>
-    </div>
-
-    <!-- HERO BANNER -->
-    <div class="relative overflow-hidden rounded-2xl border border-borderSubtle bg-gradient-to-r from-panel via-[#131927] to-panel p-8 md:p-10">
-      <div class="max-w-2xl space-y-4">
-        <span class="px-2.5 py-1 rounded bg-brand/20 border border-brand/40 text-brand text-xs font-bold uppercase tracking-wider">IBM Bob 2.0</span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-          From Exploit Risk to <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-300">Verified Protocol</span>
-        </h2>
-        <p class="text-sm md:text-base text-slate-300 leading-relaxed">
-          An autonomous AI-assisted workflow for AST vulnerability scanning, WIF key isolation, dust protection, and comprehensive unit regression.
-        </p>
-        <div class="flex gap-3 pt-2">
-          <button onclick="switchTab('pipeline')" class="px-5 py-2.5 rounded-lg bg-brand hover:bg-purple-600 font-semibold text-sm text-white transition shadow-md">Explore Workflow</button>
-          <button onclick="switchTab('reports')" class="px-5 py-2.5 rounded-lg bg-panelHover border border-borderSubtle text-slate-300 hover:text-white font-semibold text-sm transition">View Reports</button>
+        <div class="flex items-center gap-2">
+          <h1 class="text-lg font-bold tracking-tight text-white">CutoverLens</h1>
+          <span class="text-[10px] uppercase font-mono font-semibold bg-cyan-950 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded">v2.4-Production</span>
         </div>
-      </div>
-      <!-- Center Graphic circle like DebugFlow -->
-      <div class="hidden lg:flex absolute right-12 top-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-brand/30 items-center justify-center bg-brand/5">
-        <div class="w-32 h-32 rounded-full border border-brand/50 flex flex-col items-center justify-center bg-brand/10 shadow-2xl">
-          <span class="text-xs font-bold text-purple-300">BOB 2.0</span>
-          <span class="text-[10px] text-slate-400">AI SUBAGENT</span>
-        </div>
+        <p class="text-xs text-slate-400">Autonomous Release Readiness & Pre-Flight Blast Radius Engine</p>
       </div>
     </div>
 
-    <!-- METRICS GRID -->
+    <!-- Active IBM Bob Indicator & Action -->
+    <div class="flex items-center gap-4">
+      <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surfaceLight border border-line text-xs">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 glow-dot animate-pulse"></span>
+        <span class="font-mono text-slate-300">IBM Bob 2.0 Subagent Attached</span>
+      </div>
+      <button onclick="runPreFlightSimulation()" id="simulateBtn" class="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:opacity-90 text-night font-bold px-4 py-2 rounded-lg text-sm transition shadow-md">
+        <span>⚡ Rehearse Cutover</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN DASHBOARD CONTENT -->
+  <main class="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
+
+    <!-- KPI STATS CARDS ROW -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="p-5 rounded-xl border border-borderSubtle bg-panel space-y-1">
-        <span class="text-xs text-slate-400 font-medium">Bugs Fixed</span>
-        <div class="text-3xl font-extrabold text-white" id="stat-fixed">5 / 5</div>
-        <span class="text-xs text-emerald-400 font-semibold">100% verified</span>
+      <div class="p-5 rounded-xl border border-line bg-surface">
+        <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
+          <span>BLAST RADIUS</span>
+          <span class="text-cyan-400">Services</span>
+        </div>
+        <div class="text-3xl font-extrabold text-white mt-2 font-mono" id="kpi-radius">14 Modules</div>
+        <p class="text-xs text-slate-400 mt-1">3 critical paths detected</p>
       </div>
-      <div class="p-5 rounded-xl border border-borderSubtle bg-panel space-y-1">
-        <span class="text-xs text-slate-400 font-medium">Tests Passing</span>
-        <div class="text-3xl font-extrabold text-white" id="stat-tests">88 / 88</div>
-        <span class="text-xs text-emerald-400 font-semibold">100% pass rate</span>
+
+      <div class="p-5 rounded-xl border border-line bg-surface">
+        <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
+          <span>ROLLOUT DRIFT</span>
+          <span class="text-emerald-400">Env Sync</span>
+        </div>
+        <div class="text-3xl font-extrabold text-emerald-400 mt-2 font-mono" id="kpi-drift">0%</div>
+        <p class="text-xs text-slate-400 mt-1">All secrets matched</p>
       </div>
-      <div class="p-5 rounded-xl border border-borderSubtle bg-panel space-y-1">
-        <span class="text-xs text-slate-400 font-medium">Coverage</span>
-        <div class="text-3xl font-extrabold text-white">94%</div>
-        <span class="text-xs text-purple-400 font-semibold">Post-audit certified</span>
+
+      <div class="p-5 rounded-xl border border-line bg-surface">
+        <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
+          <span>MIGRATION SAFETY</span>
+          <span class="text-cyan-400">DB Schema</span>
+        </div>
+        <div class="text-3xl font-extrabold text-white mt-2 font-mono" id="kpi-db">Reversible</div>
+        <p class="text-xs text-slate-400 mt-1">Zero-downtime rollback lock</p>
       </div>
-      <div class="p-5 rounded-xl border border-borderSubtle bg-panel space-y-1">
-        <span class="text-xs text-slate-400 font-medium">Approval Gates</span>
-        <div class="text-3xl font-extrabold text-white">4 / 4</div>
-        <span class="text-xs text-emerald-400 font-semibold">Developer approved</span>
+
+      <div class="p-5 rounded-xl border border-line bg-surface">
+        <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
+          <span>BOB 2.0 VALIDATION</span>
+          <span class="text-emerald-400">Pass Rate</span>
+        </div>
+        <div class="text-3xl font-extrabold text-cyan-400 mt-2 font-mono" id="kpi-tests">32 / 32</div>
+        <p class="text-xs text-slate-400 mt-1">Pre-flight assertions green</p>
       </div>
     </div>
 
-    <!-- DYNAMIC TAB SECTIONS -->
+    <!-- CENTER DUAL WORKBENCH -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    <!-- 1. PIPELINE SECTION -->
-    <section id="section-pipeline" class="space-y-4">
-      <div class="flex justify-between items-center">
-        <div>
-          <span class="text-xs uppercase tracking-wider font-semibold text-slate-400">Orchestrated Process</span>
-          <h3 class="text-xl font-bold text-white">SecOpsFlow Pipeline</h3>
+      <!-- LEFT: TARGET REPOSITORY & PIPELINE STAGES (7 Cols) -->
+      <div class="lg:col-span-7 space-y-6">
+        
+        <!-- Live Target Release Card -->
+        <div class="p-5 rounded-xl border border-line bg-surface space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-xs uppercase font-mono font-bold tracking-wider text-cyan-400">Target Release Artifact</span>
+            <span class="text-xs font-mono text-slate-400">release-candidate/v4.1.0-hotfix</span>
+          </div>
+          <div class="p-3.5 rounded-lg bg-night border border-line flex items-center justify-between font-mono text-xs">
+            <div class="flex items-center gap-3">
+              <span class="text-emerald-400 font-bold">git commit</span>
+              <span class="text-slate-300">d4a97f2 · "Stripe webhook migration & auth policy refactor"</span>
+            </div>
+            <span class="text-slate-500">14 files modified</span>
+          </div>
         </div>
-        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          • Workflow Complete
-        </span>
+
+        <!-- 6-Stage Autonomous Cutover Protocol -->
+        <div class="p-5 rounded-xl border border-line bg-surface space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-bold text-white text-base">Autonomous Cutover Execution Matrix</h3>
+            <span class="text-xs font-mono text-emerald-400 font-semibold" id="matrixStatus">● Ready to Dry-Run</span>
+          </div>
+
+          <div class="space-y-3 font-mono text-xs" id="stageContainer">
+            <!-- Stage Item 1 -->
+            <div class="p-3.5 rounded-lg bg-surfaceLight border border-line flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-cyan-400 font-bold">STAGE 01</span>
+                <div>
+                  <div class="text-white font-bold">AST Dependency & Blast Radius Analysis</div>
+                  <div class="text-slate-400 text-[11px]">Traces call graphs for database pools & authentication gates</div>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">PASSED</span>
+            </div>
+
+            <!-- Stage Item 2 -->
+            <div class="p-3.5 rounded-lg bg-surfaceLight border border-line flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-cyan-400 font-bold">STAGE 02</span>
+                <div>
+                  <div class="text-white font-bold">Non-Destructive DB Migration Dry-Run</div>
+                  <div class="text-slate-400 text-[11px]">Verifies idempotency on schema forward & rollback steps</div>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">PASSED</span>
+            </div>
+
+            <!-- Stage Item 3 -->
+            <div class="p-3.5 rounded-lg bg-surfaceLight border border-line flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-cyan-400 font-bold">STAGE 03</span>
+                <div>
+                  <div class="text-white font-bold">Runtime Configuration & Secret Guard</div>
+                  <div class="text-slate-400 text-[11px]">Enforces .bobignore zero-credential exposure policy</div>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">PASSED</span>
+            </div>
+
+            <!-- Stage Item 4 -->
+            <div class="p-3.5 rounded-lg bg-surfaceLight border border-line flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-cyan-400 font-bold">STAGE 04</span>
+                <div>
+                  <div class="text-white font-bold">Autonomous Bob 2.0 Integration Test Suite</div>
+                  <div class="text-slate-400 text-[11px]">Synthesizes regression suites for newly created paths</div>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">PASSED</span>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <div class="space-y-2.5" id="pipeline-steps">
-        <!-- Steps 01 to 09 dynamically generated below -->
-      </div>
-    </section>
+      <!-- RIGHT: LIVE AUDIT TERMINAL & BOB AGENT FEEDBACK (5 Cols) -->
+      <div class="lg:col-span-5 space-y-6">
+        
+        <!-- Live Terminal Inspector -->
+        <div class="p-5 rounded-xl border border-line bg-surface flex flex-col h-full space-y-3">
+          <div class="flex justify-between items-center border-b border-line pb-2">
+            <span class="font-mono text-xs text-slate-300 flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+              Bob 2.0 Agent Telemetry
+            </span>
+            <span class="text-[11px] font-mono text-slate-500">pty: ttyS0</span>
+          </div>
 
-    <!-- 2. FINDINGS SECTION -->
-    <section id="section-findings" class="space-y-4 pt-4">
+          <div id="terminalBody" class="p-4 rounded-lg bg-night border border-line font-mono text-xs text-slate-300 space-y-2 h-72 overflow-y-auto leading-relaxed">
+            <p class="text-slate-500"># Initializing CutoverLens subagent session...</p>
+            <p class="text-cyan-400">[Bob 2.0] Repository context loaded: 48 source files indexed.</p>
+            <p class="text-emerald-400">✓ Blast radius mapping completed without orphan nodes.</p>
+            <p class="text-slate-300">> Checking .env.production against staging schema...</p>
+            <p class="text-emerald-400">✓ Zero credential leakage: .bobignore enforced.</p>
+            <p class="text-slate-400">[Standby] Ready for full pre-flight cutover rehearsal.</p>
+          </div>
+
+          <!-- Remediation & Action Card -->
+          <div class="p-4 rounded-lg bg-surfaceLight border border-line space-y-2">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-bold text-white">Cutover Decision Gate</span>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">APPROVED FOR RELEASE</span>
+            </div>
+            <p class="text-xs text-slate-400 leading-normal">
+              Autonomous verification confirms all rollback invariants are satisfied. Production deployment will incur 0ms expected downtime.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- COMPARISON STATS FOOTER -->
+    <div class="p-6 rounded-xl border border-line bg-surface grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
       <div>
-        <span class="text-xs uppercase tracking-wider font-semibold text-slate-400">Root Cause Analysis</span>
-        <h3 class="text-xl font-bold text-white">Security Findings</h3>
+        <div class="text-xs font-mono text-slate-400">TRADITIONAL RELEASE AUDIT</div>
+        <div class="text-2xl font-bold text-rose-400 mt-1 font-mono">1.5 - 3 Hours</div>
+        <div class="text-xs text-slate-500 mt-0.5">Manual test check & staging verification</div>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="p-4 rounded-xl border border-borderSubtle bg-panel flex justify-between items-center">
-          <div class="flex items-center gap-3">
-            <span class="px-2 py-1 rounded text-xs font-bold bg-purple-500/20 text-purple-300">B1</span>
-            <div>
-              <h4 class="text-sm font-bold text-white">Hardcoded WIF Private Key</h4>
-              <p class="text-xs text-slate-400">Exposed private key in backend script.</p>
-            </div>
-          </div>
-          <span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">FIXED</span>
-        </div>
-
-        <div class="p-4 rounded-xl border border-borderSubtle bg-panel flex justify-between items-center">
-          <div class="flex items-center gap-3">
-            <span class="px-2 py-1 rounded text-xs font-bold bg-purple-500/20 text-purple-300">B2</span>
-            <div>
-              <h4 class="text-sm font-bold text-white">Plaintext BIP-39 Seed Mnemonic</h4>
-              <p class="text-xs text-slate-400">Recovery mnemonic committed to repository.</p>
-            </div>
-          </div>
-          <span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">FIXED</span>
-        </div>
-
-        <div class="p-4 rounded-xl border border-borderSubtle bg-panel flex justify-between items-center">
-          <div class="flex items-center gap-3">
-            <span class="px-2 py-1 rounded text-xs font-bold bg-purple-500/20 text-purple-300">B3</span>
-            <div>
-              <h4 class="text-sm font-bold text-white">Dynamic Execution (exec)</h4>
-              <p class="text-xs text-slate-400">Arbitrary script injection vulnerability.</p>
-            </div>
-          </div>
-          <span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">FIXED</span>
-        </div>
-
-        <div class="p-4 rounded-xl border border-borderSubtle bg-panel flex justify-between items-center">
-          <div class="flex items-center gap-3">
-            <span class="px-2 py-1 rounded text-xs font-bold bg-purple-500/20 text-purple-300">B4</span>
-            <div>
-              <h4 class="text-sm font-bold text-white">Sub-Dust Limit Violation</h4>
-              <p class="text-xs text-slate-400">Outputs under 546 satoshis rejected by mempool.</p>
-            </div>
-          </div>
-          <span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">FIXED</span>
-        </div>
-
-        <div class="p-4 rounded-xl border border-borderSubtle bg-panel flex justify-between items-center">
-          <div class="flex items-center gap-3">
-            <span class="px-2 py-1 rounded text-xs font-bold bg-purple-500/20 text-purple-300">B5</span>
-            <div>
-              <h4 class="text-sm font-bold text-white">Cryptographically Insecure Hash (MD5)</h4>
-              <p class="text-xs text-slate-400">Replaced with Bitcoin-standard Double-SHA256.</p>
-            </div>
-          </div>
-          <span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">FIXED</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- 3. BEFORE VS AFTER COMPARISON -->
-    <section class="space-y-4 pt-4">
       <div>
-        <span class="text-xs uppercase tracking-wider font-semibold text-slate-400">Verification</span>
-        <h3 class="text-xl font-bold text-white">Before vs After</h3>
+        <div class="text-xs font-mono text-slate-400">CUTOVERLENS + BOB 2.0</div>
+        <div class="text-2xl font-bold text-emerald-400 mt-1 font-mono">14.2 Seconds</div>
+        <div class="text-xs text-slate-500 mt-0.5">Automated subagent rehearsal</div>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Before -->
-        <div class="p-6 rounded-2xl border border-borderSubtle bg-panel space-y-4">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Before SecOpsFlow</span>
-          <div class="text-5xl font-extrabold text-blue-500">42%</div>
-          <span class="text-xs text-slate-400">Automated test pass rate</span>
-          <div class="space-y-1.5 pt-2 text-sm">
-            <div class="flex justify-between text-emerald-400"><span>✓ Passed Tests</span> <span class="font-bold">37</span></div>
-            <div class="flex justify-between text-rose-500"><span>✗ Failed Exploits</span> <span class="font-bold">51</span></div>
-            <div class="flex justify-between text-amber-400"><span>Security Lint Issues</span> <span class="font-bold">5</span></div>
-          </div>
-        </div>
-
-        <!-- After -->
-        <div class="p-6 rounded-2xl border border-borderSubtle bg-panel space-y-4">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">After SecOpsFlow (Bob 2.0)</span>
-          <div class="text-5xl font-extrabold text-white">100%</div>
-          <span class="text-xs text-slate-400">Automated test pass rate</span>
-          <div class="space-y-1.5 pt-2 text-sm">
-            <div class="flex justify-between text-emerald-400"><span>✓ Passed Tests</span> <span class="font-bold">88</span></div>
-            <div class="flex justify-between text-slate-400"><span>✗ Failed Exploits</span> <span class="font-bold">0</span></div>
-            <div class="flex justify-between text-slate-400"><span>Security Lint Issues</span> <span class="font-bold">0</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 4. PRODUCTIVITY / TIME SAVINGS -->
-    <section class="space-y-4 pt-4">
       <div>
-        <span class="text-xs uppercase tracking-wider font-semibold text-slate-400">Productivity Measurement</span>
-        <h3 class="text-xl font-bold text-white">Security Auditing Time</h3>
+        <div class="text-xs font-mono text-slate-400">ENGINEERING RISK REDUCTION</div>
+        <div class="text-2xl font-bold text-cyan-400 mt-1 font-mono">98.4%</div>
+        <div class="text-xs text-slate-500 mt-0.5">Zero release rollback incident rate</div>
       </div>
+    </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="p-6 rounded-xl border border-borderSubtle bg-panel">
-          <span class="text-xs text-slate-400">Estimated Manual Audit</span>
-          <div class="text-4xl font-extrabold text-white mt-1">45 min</div>
-        </div>
-        <div class="p-6 rounded-xl border border-borderSubtle bg-panel">
-          <span class="text-xs text-slate-400">SecOpsFlow Session</span>
-          <div class="text-4xl font-extrabold text-white mt-1">0.83 sec</div>
-        </div>
-        <div class="p-6 rounded-xl border border-borderSubtle bg-panel">
-          <span class="text-xs text-slate-400">Estimated Time Saved</span>
-          <div class="text-4xl font-extrabold text-emerald-400 mt-1">~44 min</div>
-        </div>
-      </div>
-    </section>
+    <!-- FOOTER SIGNATURE -->
+    <div class="border-t border-line pt-4 flex flex-col sm:flex-row justify-between text-xs text-slate-500 font-mono">
+      <span>CutoverLens · Autonomous SRE & Release Engineering</span>
+      <span>Built for IBM Bob 2.0 Hackathon (Lablab.ai)</span>
+    </div>
 
-    <!-- FOOTER -->
-    <footer class="pt-8 border-t border-borderSubtle flex justify-between text-xs text-slate-500">
-      <span>BitSecOps Flow · AI-Assisted Developer Workflow</span>
-      <span>Built with IBM Bob 2.0</span>
-    </footer>
   </main>
 
   <script>
-    const steps = [
-      { num: '01', title: 'Codebase Analysis', desc: 'Understand Bitcoin repository structure and AST semantics' },
-      { num: '02', title: 'Root Cause Analysis', desc: 'Identify defective transaction logic & key exposures' },
-      { num: '03', title: 'Parallel Investigation', desc: 'Multiple Bob subagents inspect crypto primitives' },
-      { num: '04', title: 'Developer Approval', desc: 'Human-in-the-loop checkpoint for safe remediation' },
-      { num: '05', title: 'Fix Implementation', desc: 'Apply environment secret isolation and dust limits' },
-      { num: '06', title: 'Testing Suite Generation', desc: 'Synthesize automated pytest unit fixtures' },
-      { num: '07', title: 'Verification', desc: 'Confirm fixes and prevent regression (88 tests)' },
-      { num: '08', title: 'Code Review', desc: 'BIP-39 & Bitcoin standard compliance check' },
-      { num: '09', title: 'Security Audit Report', desc: 'Document verified findings and remediation results' }
-    ];
+    function runPreFlightSimulation() {
+      const btn = document.getElementById('simulateBtn');
+      const terminal = document.getElementById('terminalBody');
+      const status = document.getElementById('matrixStatus');
 
-    const pipelineContainer = document.getElementById('pipeline-steps');
-    steps.forEach(s => {
-      const el = document.createElement('div');
-      el.className = "p-4 rounded-xl border border-borderSubtle bg-panel hover:bg-panelHover transition flex items-center justify-between";
-      el.innerHTML = `
-        <div class="flex items-center gap-4">
-          <span class="text-xs font-mono font-bold text-purple-400">${s.num}</span>
-          <div>
-            <h4 class="text-sm font-bold text-white">${s.title}</h4>
-            <p class="text-xs text-slate-400">${s.desc}</p>
-          </div>
-        </div>
-        <span class="text-emerald-400 text-xs font-bold">✓ Verified</span>
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin">⟳</span> Simulating...`;
+      status.innerText = "● Simulation in progress...";
+      status.className = "text-xs font-mono text-amberAlert font-semibold";
+
+      terminal.innerHTML += `
+        <p class="text-amberAlert mt-2">----------------------------------------</p>
+        <p class="text-amberAlert">> [REHEARSAL] Triggering simulated cutover event...</p>
       `;
-      pipelineContainer.appendChild(el);
-    });
+      terminal.scrollTop = terminal.scrollHeight;
 
-    function switchTab(tabId) {
-      document.querySelectorAll('nav button').forEach(b => {
-        b.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-panelHover transition";
-      });
-      const activeBtn = document.getElementById('nav-' + tabId);
-      if (activeBtn) {
-        activeBtn.className = "w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-semibold bg-brand text-white shadow-md transition";
-      }
-    }
-
-    function startSecOpsFlow() {
-      const btn = document.getElementById('startBtn');
-      btn.innerText = "Running Bob 2.0 Subagents...";
-      btn.style.opacity = "0.7";
       setTimeout(() => {
-        btn.innerText = "✓ SecOps Flow Complete";
-        btn.style.opacity = "1";
-        alert("IBM Bob 2.0 Subagent execution complete! All 88 regression tests passed with zero leaks.");
-      }, 1200);
+        terminal.innerHTML += `
+          <p class="text-cyan-400">> Simulating synthetic traffic injection (1,000 req/sec)...</p>
+          <p class="text-emerald-400">✓ Database pool healthy: latencies < 12ms.</p>
+        `;
+        terminal.scrollTop = terminal.scrollHeight;
+      }, 700);
+
+      setTimeout(() => {
+        terminal.innerHTML += `
+          <p class="text-cyan-400">> Validating backward compatibility on v4.0 endpoints...</p>
+          <p class="text-emerald-400">✓ All 32 automated verification probes PASSED.</p>
+          <p class="text-emerald-400 font-bold">> [SUCCESS] Ready for zero-downtime release!</p>
+        `;
+        terminal.scrollTop = terminal.scrollHeight;
+        btn.disabled = false;
+        btn.innerHTML = `<span>✓ Rehearsal Complete</span>`;
+        status.innerText = "● Ready to Deploy";
+        status.className = "text-xs font-mono text-emeraldAccent font-semibold";
+      }, 1600);
     }
   </script>
 </body>
