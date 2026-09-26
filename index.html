@@ -1,294 +1,538 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CutoverLens | Autonomous Release Readiness Platform</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Space Grotesk"', 'sans-serif'],
-            mono: ['"Fira Code"', 'monospace'],
-          },
-          colors: {
-            night: '#06090E',
-            surface: '#0D131C',
-            surfaceLight: '#141D2B',
-            line: '#202D42',
-            emeraldAccent: '#10B981',
-            cyanGlow: '#06B6D4',
-            crimson: '#F43F5E',
-            amberAlert: '#F59E0B'
-          }
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upkeep Console — Maintenance Copilot for IBM Bob 2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#101010; --bg2:#161616; --panel:#1B1B1B; --panel2:#212121;
+  --line:#333333; --yellow:#FFD400; --yellow-soft:#FFE873; --yellow-deep:#C9A100;
+  --cream:#F6F6F1; --muted:#A6A6A0; --ok:#4ADE80; --warn:#F0664F;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--cream);font-family:'IBM Plex Sans',sans-serif;}
+h1,h2,h3{font-family:'Sora',sans-serif;margin:0;color:var(--cream);}
+.mono{font-family:'IBM Plex Mono',monospace;}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px;}
+
+nav{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(16,16,16,.95);backdrop-filter:blur(6px);z-index:10;}
+nav .row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;flex-wrap:wrap;gap:12px;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-mark{width:34px;height:34px;border-radius:8px;background:var(--yellow);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;color:#141400;font-size:17px;}
+.brand-name{font-family:'Sora',sans-serif;font-weight:700;font-size:17px;}
+.brand-sub{font-size:11.5px;color:var(--muted);}
+.nav-links{display:flex;gap:22px;}
+.nav-links a{font-size:13.5px;color:var(--muted);text-decoration:none;font-weight:500;}
+.nav-links a:hover{color:var(--yellow);}
+.run-btn{background:var(--yellow);border:1px solid var(--yellow);color:#141400;font-size:13.5px;font-weight:700;padding:10px 18px;border-radius:8px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;}
+.run-btn:disabled{opacity:.6;cursor:default;}
+.ghost-btn{background:transparent;border:1px solid var(--line);color:var(--cream);font-size:13.5px;font-weight:600;padding:10px 18px;border-radius:8px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;}
+
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);}
+#netcanvas{position:absolute;inset:0;width:100%;height:100%;}
+.hero-inner{position:relative;padding:76px 0 52px;}
+.kicker{color:var(--yellow);font-size:14.5px;font-weight:700;margin-bottom:16px;}
+.headline{font-size:50px;line-height:1.1;max-width:680px;font-weight:800;}
+.lede{color:#D8D6CC;font-size:17px;max-width:540px;margin-top:18px;}
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:44px;}
+.kpi{background:rgba(27,27,27,.85);border:1px solid var(--line);border-radius:12px;padding:20px;}
+.kpi .label{font-size:12.5px;color:var(--muted);margin-bottom:8px;font-weight:500;}
+.kpi .num{font-family:'Sora',sans-serif;font-size:32px;font-weight:800;color:var(--yellow);}
+.kpi .num.ok{color:var(--ok);}
+.kpi .sub{font-size:12px;color:var(--muted);margin-top:5px;}
+
+section{padding:56px 0;border-bottom:1px solid var(--line);}
+.section-head{max-width:640px;margin-bottom:32px;}
+.section-head h2{font-size:29px;}
+.section-head p{color:var(--muted);font-size:15px;margin-top:9px;}
+
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px;}
+.how-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;}
+.how-card .n{color:var(--yellow);font-family:'Sora',sans-serif;font-weight:800;font-size:20px;margin-bottom:10px;}
+.how-card h4{font-size:14.5px;margin-bottom:6px;}
+.how-card p{font-size:13px;color:var(--muted);margin:0;}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.panel-box{border-radius:12px;padding:22px;border:1px solid var(--line);}
+.panel-box.before{background:var(--panel);}
+.panel-box.after{background:linear-gradient(160deg,#2A2400,#161616);border-color:var(--yellow-deep);}
+
+/* analyzer */
+.analyzer-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;}
+#codeInput{width:100%;height:220px;background:#0B0B0B;border:1px solid var(--line);border-radius:12px;color:var(--cream);font-family:'IBM Plex Mono',monospace;font-size:13px;padding:16px;resize:vertical;}
+#codeInput:focus{outline:none;border-color:var(--yellow-deep);}
+.analyzer-controls{display:flex;gap:10px;margin-top:12px;}
+.analyzer-controls select{background:var(--panel);border:1px solid var(--line);color:var(--cream);padding:10px 12px;border-radius:8px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;}
+.analyzer-output{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;min-height:220px;}
+.analyzer-output .empty{color:var(--muted);font-size:13.5px;}
+.score-card{display:flex;align-items:center;gap:16px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px;}
+.score-num{font-family:'Sora',sans-serif;font-size:38px;font-weight:800;color:var(--ok);}
+.score-num.mid{color:var(--yellow);}
+.score-num.low{color:var(--warn);}
+.score-card h3{font-size:15px;}
+.score-card p{font-size:12.5px;color:var(--muted);margin:4px 0 0;}
+.findings-list{margin-bottom:16px;}
+.f-item{display:flex;gap:8px;font-size:13px;padding:6px 0;border-top:1px solid var(--line);}
+.f-item:first-child{border-top:none;}
+.f-item.ok{color:var(--ok);}
+.f-item.warn{color:var(--yellow-soft);}
+.f-item.bad{color:var(--warn);}
+.accordion-item{border:1px solid var(--line);border-radius:8px;margin-bottom:8px;overflow:hidden;}
+.acc-head{padding:12px 14px;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;background:var(--panel2);}
+.acc-body{padding:0 14px;max-height:0;overflow:hidden;transition:max-height .25s ease, padding .25s ease;font-size:13px;color:var(--muted);}
+.accordion-item.open .acc-body{padding:12px 14px;max-height:400px;}
+
+.timeline{position:relative;}
+.tl-row{display:grid;grid-template-columns:56px 1fr;gap:20px;padding-bottom:28px;position:relative;}
+.tl-row:last-child{padding-bottom:0;}
+.tl-marker{display:flex;flex-direction:column;align-items:center;}
+.tl-num{width:40px;height:40px;border-radius:50%;background:var(--panel2);border:2px solid var(--yellow-deep);color:var(--yellow);font-family:'Sora',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tl-line{width:2px;flex:1;background:var(--line);margin-top:6px;}
+.tl-content{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;}
+.tl-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.tl-head h3{font-size:17px;}
+.stage-count{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--yellow);background:var(--panel2);padding:3px 10px;border-radius:10px;}
+.tl-desc{font-size:13.5px;color:var(--muted);margin:0 0 14px;}
+.tl-items{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:6px 11px;font-size:12.5px;transition:opacity .4s;}
+.chip.pending{opacity:.35;}
+.chip.held{border-color:var(--warn);color:var(--warn);}
+
+.findings{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.finding{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;gap:14px;}
+.finding .idx{font-family:'IBM Plex Mono',monospace;color:var(--yellow-deep);font-size:13px;}
+.finding h4{font-size:14.5px;margin:0 0 6px;font-weight:600;}
+.finding p{font-size:13px;color:var(--muted);margin:0;}
+.finding .result{display:inline-block;margin-top:9px;font-size:12px;font-weight:700;color:var(--ok);}
+.finding .result.held{color:var(--warn);}
+
+.impact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.impact-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;text-align:center;}
+.impact-card .lbl{font-size:12.5px;color:var(--muted);margin-bottom:8px;}
+.impact-card .val{font-family:'Sora',sans-serif;font-size:30px;font-weight:800;}
+.impact-card .val.y{color:var(--yellow);}
+.impact-card .val.ok{color:var(--ok);}
+
+.verify-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.mline{display:flex;justify-content:space-between;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px;}
+.mline:first-of-type{border-top:none;}
+.big{font-family:'Sora',sans-serif;font-size:40px;font-weight:800;margin:6px 0 14px;color:var(--yellow);}
+.log{background:#0B0B0B;border:1px solid var(--line);border-radius:12px;padding:16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--muted);height:240px;overflow-y:auto;line-height:1.8;}
+.log .ok-line{color:var(--ok);}
+.log .warn-line{color:var(--yellow-soft);}
+
+footer{padding:36px 0;border-bottom:none;}
+footer .row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+footer p{font-size:12.5px;color:var(--muted);max-width:540px;}
+
+@media(max-width:900px){
+  .findings,.compare,.kpi-row,.how-grid,.impact-grid,.analyzer-grid{grid-template-columns:1fr;}
+  .headline{font-size:32px;}
+  .nav-links{display:none;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap row">
+    <div class="brand">
+      <div class="brand-mark">U</div>
+      <div><div class="brand-name">Upkeep Console</div><div class="brand-sub">Maintenance copilot · IBM Bob 2.0</div></div>
+    </div>
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#analyzer">Analyze code</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#findings">Findings</a>
+      <a href="#verify">Verification</a>
+    </div>
+    <button class="run-btn" id="runBtn">Run maintenance scan</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <canvas id="netcanvas"></canvas>
+  <div class="wrap hero-inner">
+    <div class="kicker">IBM Bob 2.0 Hackathon — application maintenance workflow</div>
+    <h1 class="headline">The debt was always visible. Nobody had time to look.</h1>
+    <p class="lede">Upkeep points Bob 2.0 at a live repository, has it triage every piece of accumulated debt, and dispatches parallel subagents to fix what's safe — leaving a clear, reviewable trail for the rest.</p>
+    <div class="kpi-row">
+      <div class="kpi"><div class="label">Debt items found</div><div class="num" id="k-found">9</div><div class="sub">checkout-service</div></div>
+      <div class="kpi"><div class="label">Auto-fixed by Bob</div><div class="num ok" id="k-fixed">0</div><div class="sub">via parallel subagents</div></div>
+      <div class="kpi"><div class="label">Test coverage</div><div class="num" id="k-cov">61%</div><div class="sub">before scan</div></div>
+      <div class="kpi"><div class="label">Flagged for review</div><div class="num" id="k-flag">—</div><div class="sub">major version bump</div></div>
+    </div>
+  </div>
+</header>
+
+<section id="overview">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>What Upkeep does</h2>
+      <p>A repository never stays clean on its own. Upkeep runs Bob 2.0 on a fixed cadence, turns whatever it finds into a scored, auditable backlog, and only auto-ships the fixes a developer would have approved anyway.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-card"><div class="n">1</div><h4>Scan on a schedule</h4><p>Bob reads the whole repository, not just the latest diff, so debt from six months ago surfaces too.</p></div>
+      <div class="how-card"><div class="n">2</div><h4>Score before touching anything</h4><p>Every item gets a risk and effort score. Nothing is fixed until it's been classified.</p></div>
+      <div class="how-card"><div class="n">3</div><h4>Fix in parallel, verify every time</h4><p>Safe items go to subagents at once; each fix is re-tested before it's marked done.</p></div>
+    </div>
+    <div class="compare" style="margin-top:32px;">
+      <div class="panel-box before">
+        <div class="mono" style="color:var(--muted);font-size:12px;">Without Upkeep</div>
+        <p style="font-size:14px;color:var(--cream);margin-top:10px;">Debt gets found by accident — during an outage, a slow PR review, or a new hire asking why a function still exists. By then it's expensive to fix.</p>
+      </div>
+      <div class="panel-box after">
+        <div class="mono" style="color:var(--yellow);font-size:12px;">With Upkeep</div>
+        <p style="font-size:14px;color:var(--cream);margin-top:10px;">Bob scans on schedule, classifies each item by risk and effort, fixes the safe ones in parallel, and hands the rest to a developer with full context attached.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="analyzer">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Try it — paste your own code</h2>
+      <p>Drop in a real function or file. Upkeep runs the same kind of quick check Bob does during a scan: what it does, what looks risky, and a plain-language read for anyone newer to the codebase.</p>
+    </div>
+    <div class="analyzer-grid">
+      <div>
+        <textarea id="codeInput" placeholder="Paste a function, component, or file here…"></textarea>
+        <div class="analyzer-controls">
+          <select id="langSelect">
+            <option>Auto-detect</option>
+            <option>JavaScript</option>
+            <option>Python</option>
+            <option>HTML</option>
+            <option>Other</option>
+          </select>
+          <button class="run-btn" id="analyzeBtn">Analyze code</button>
+          <button class="ghost-btn" id="clearBtn">Clear</button>
+        </div>
+      </div>
+      <div class="analyzer-output" id="analyzerOutput">
+        <div class="empty">Paste something on the left and press "Analyze code" to see its health score, flagged risks, and a plain-language explanation.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pipeline">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Debt pipeline</h2>
+      <p>Every item moves through the same five gates. Press "Run maintenance scan" above to watch Bob move items through live.</p>
+    </div>
+    <div class="timeline">
+      <div class="tl-row">
+        <div class="tl-marker"><div class="tl-num">01</div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-head"><h3>Detected</h3><span class="stage-count">9</span></div>
+          <p class="tl-desc">Bob's scan surfaces every stale dependency, dead branch, and untested path across the repository.</p>
+          <div class="tl-items">
+            <span class="chip">lodash 4.17.11 — known CVE</span>
+            <span class="chip">legacyDiscount() unused</span>
+            <span class="chip">payment retry untested</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-marker"><div class="tl-num">02</div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-head"><h3>Triaged</h3><span class="stage-count">9</span></div>
+          <p class="tl-desc">Each item is scored for risk and effort before anything is touched.</p>
+          <div class="tl-items">
+            <span class="chip">CVE exposure — high risk</span>
+            <span class="chip">duplicate validator — low risk</span>
+            <span class="chip">unhandled rejection — medium risk</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-marker"><div class="tl-num">03</div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-head"><h3>Bob fixing</h3><span class="stage-count" id="cnt-fixing">0 of 7</span></div>
+          <p class="tl-desc">Subagents work the safe items in parallel, each on its own branch.</p>
+          <div class="tl-items" id="stage-fixing">
+            <span class="chip pending" data-fix>Bump lodash, patch call sites</span>
+            <span class="chip pending" data-fix>Remove 3 dead code branches</span>
+            <span class="chip pending" data-fix>Add retry-path test coverage</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-marker"><div class="tl-num">04</div><div class="tl-line"></div></div>
+        <div class="tl-content">
+          <div class="tl-head"><h3>Verified</h3><span class="stage-count" id="cnt-verified">0 of 7</span></div>
+          <p class="tl-desc">Every fix is re-run against the existing suite before it counts as done.</p>
+          <div class="tl-items" id="stage-verified">
+            <span class="chip pending" data-verify>41 tests re-run, 0 regressions</span>
+            <span class="chip pending" data-verify>Coverage delta confirmed +27%</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-row">
+        <div class="tl-marker"><div class="tl-num">05</div></div>
+        <div class="tl-content">
+          <div class="tl-head"><h3>Shipped</h3><span class="stage-count" id="cnt-shipped">0 of 7</span></div>
+          <p class="tl-desc">Fixes ship with a changelog; anything out of scope stays visible, not hidden.</p>
+          <div class="tl-items">
+            <span class="chip pending" id="stage-shipped" data-ship>7 commits, changelog drafted</span>
+            <span class="chip held">2 items held for maintainer review</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="findings">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>What Bob found</h2>
+      <p>Nine items from checkout-service, each classified by risk and effort before any fix was attempted.</p>
+    </div>
+    <div class="findings">
+      <div class="finding"><span class="idx">01</span><div><h4>Outdated dependency with an open CVE</h4><p>lodash 4.17.11 sat three majors behind, flagged in the audit log for months.</p><span class="result">Fixed · call sites patched</span></div></div>
+      <div class="finding"><span class="idx">02</span><div><h4>Dead discount code path</h4><p>legacyDiscount() had no callers left after last quarter's pricing rewrite.</p><span class="result">Fixed · removed, tests pass</span></div></div>
+      <div class="finding"><span class="idx">03</span><div><h4>Untested payment retry logic</h4><p>The retry handler shipped without coverage for its timeout branch.</p><span class="result">Fixed · 6 new tests added</span></div></div>
+      <div class="finding"><span class="idx">04</span><div><h4>Duplicate address validation</h4><p>Two modules validated postal codes with slightly different rules.</p><span class="result">Fixed · consolidated to one</span></div></div>
+      <div class="finding"><span class="idx">05</span><div><h4>Unhandled promise rejection</h4><p>A webhook handler could fail silently under load.</p><span class="result">Fixed · error path added</span></div></div>
+      <div class="finding"><span class="idx">06</span><div><h4>Stale feature flag</h4><p>A launch flag from an old rollout was still being checked on every request.</p><span class="result">Fixed · flag and branch removed</span></div></div>
+      <div class="finding"><span class="idx">07</span><div><h4>Inconsistent error logging format</h4><p>Three different log shapes made the error dashboard hard to query.</p><span class="result">Fixed · unified to one schema</span></div></div>
+      <div class="finding"><span class="idx">08</span><div><h4>Framework major-version gap</h4><p>Upgrading touches routing conventions across 40+ files.</p><span class="result held">Held for maintainer review</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="verify">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Before and after</h2>
+      <p>Same repository, one scan apart. The log on the right is what Bob reported during the run.</p>
+    </div>
+    <div class="verify-grid">
+      <div>
+        <div class="compare">
+          <div class="panel-box before">
+            <div class="mono" style="color:var(--muted);font-size:12px;">Before</div>
+            <div class="big" id="v-before">61%</div>
+            <div class="mline"><span>Known CVEs</span><strong>1</strong></div>
+            <div class="mline"><span>Dead code branches</span><strong>3</strong></div>
+            <div class="mline"><span>Open debt items</span><strong>9</strong></div>
+          </div>
+          <div class="panel-box after">
+            <div class="mono" style="color:var(--yellow);font-size:12px;">After</div>
+            <div class="big" id="v-after">61%</div>
+            <div class="mline"><span>Known CVEs</span><strong id="v-cve">1</strong></div>
+            <div class="mline"><span>Dead code branches</span><strong id="v-dead">3</strong></div>
+            <div class="mline"><span>Open debt items</span><strong id="v-open">9</strong></div>
+          </div>
+        </div>
+      </div>
+      <div class="log" id="logPanel">
+        <div>Idle. Press "Run maintenance scan" to start a session.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="impact" style="border-bottom:none;">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Time this actually saves</h2>
+      <p>Estimated against a manual review of the same repository by one developer.</p>
+    </div>
+    <div class="impact-grid">
+      <div class="impact-card"><div class="lbl">Manual audit + fixes</div><div class="val">~14 hrs</div></div>
+      <div class="impact-card"><div class="lbl">Upkeep session</div><div class="val y">~9 min</div></div>
+      <div class="impact-card"><div class="lbl">Developer time returned</div><div class="val ok">13.8 hrs</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap row">
+    <div>
+      <div class="brand-name" style="font-size:15px;">Upkeep Console</div>
+      <p>Built for the IBM Bob 2.0 Hackathon. Bob ran the repository scan, classified each finding, and dispatched parallel subagents to fix the seven items marked safe — every fix re-verified against the existing test suite before it counted as done.</p>
+    </div>
+    <div class="mono" style="color:var(--muted);font-size:12px;">Sample repository shown for demonstration.</div>
+  </div>
+</footer>
+
+<script>
+/* animated network background */
+const canvas = document.getElementById('netcanvas');
+const ctx = canvas.getContext('2d');
+const hero = canvas.parentElement;
+function resize(){ canvas.width = hero.offsetWidth; canvas.height = hero.offsetHeight; }
+resize(); window.addEventListener('resize', resize);
+const N = 46;
+const pts = Array.from({length:N}, () => ({
+  x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+  vx: (Math.random()-0.5)*0.35, vy: (Math.random()-0.5)*0.35
+}));
+function tick(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(const p of pts){
+    p.x += p.vx; p.y += p.vy;
+    if(p.x<0||p.x>canvas.width) p.vx*=-1;
+    if(p.y<0||p.y>canvas.height) p.vy*=-1;
+  }
+  for(let i=0;i<N;i++){
+    for(let j=i+1;j<N;j++){
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<130){
+        ctx.strokeStyle = `rgba(255,212,0,${(1-d/130)*0.4})`;
+        ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y); ctx.stroke();
       }
     }
-  </script>
-  <style>
-    body { background-color: #06090E; color: #E2E8F0; }
-    .glow-box { box-shadow: 0 0 25px rgba(6, 182, 212, 0.15); }
-    .glow-dot { box-shadow: 0 0 10px #10B981; }
-  </style>
-</head>
-<body class="min-h-screen flex flex-col font-sans">
+  }
+  for(const p of pts){
+    ctx.fillStyle='rgba(255,212,0,0.6)';
+    ctx.beginPath(); ctx.arc(p.x,p.y,1.6,0,Math.PI*2); ctx.fill();
+  }
+  requestAnimationFrame(tick);
+}
+tick();
 
-  <!-- TOP HEADER / NAV -->
-  <header class="border-b border-line bg-surface/80 backdrop-blur sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
-    <div class="flex items-center gap-4">
-      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-emerald-500 flex items-center justify-center font-mono font-bold text-night text-xl shadow-lg">
-        ⎈
-      </div>
-      <div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-lg font-bold tracking-tight text-white">CutoverLens</h1>
-          <span class="text-[10px] uppercase font-mono font-semibold bg-cyan-950 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded">v2.4-Production</span>
-        </div>
-        <p class="text-xs text-slate-400">Autonomous Release Readiness & Pre-Flight Blast Radius Engine</p>
-      </div>
+/* smooth scroll for nav links */
+document.querySelectorAll('.nav-links a').forEach(a=>{
+  a.addEventListener('click', e=>{
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href')).scrollIntoView({behavior:'smooth'});
+  });
+});
+
+/* ---- run maintenance scan simulation ---- */
+const runBtn = document.getElementById('runBtn');
+const logPanel = document.getElementById('logPanel');
+function logLine(text, cls){
+  const d = document.createElement('div');
+  if(cls) d.className = cls;
+  d.textContent = text;
+  logPanel.appendChild(d);
+  logPanel.scrollTop = logPanel.scrollHeight;
+}
+runBtn.addEventListener('click', ()=>{
+  document.getElementById('verify').scrollIntoView({behavior:'smooth'});
+  runBtn.disabled = true;
+  runBtn.textContent = 'Scan running…';
+  logPanel.innerHTML = '';
+  logLine('Connecting to checkout-service repository…');
+  document.getElementById('k-fixed').textContent = '0';
+  const steps = [
+    {t:900,  fn:()=>{ logLine('Bob 2.0: repository context loaded, 9 debt items indexed.'); }},
+    {t:1700, fn:()=>{ logLine('Triage complete: 7 safe to auto-fix, 2 flagged for review.', 'warn-line'); document.getElementById('k-flag').textContent='2'; }},
+    {t:2600, fn:()=>{ document.querySelectorAll('#stage-fixing [data-fix]').forEach(el=>el.classList.remove('pending'));
+                      document.getElementById('cnt-fixing').textContent='3 of 7';
+                      logLine('Subagent A: dependency bump patched.', 'ok-line'); }},
+    {t:3400, fn:()=>{ logLine('Subagent B: dead code removed, imports cleaned.', 'ok-line');
+                      document.getElementById('k-fixed').textContent='4'; }},
+    {t:4200, fn:()=>{ logLine('Subagent C: retry-path tests written and passing.', 'ok-line');
+                      document.getElementById('k-fixed').textContent='7';
+                      document.getElementById('cnt-fixing').textContent='7 of 7'; }},
+    {t:5000, fn:()=>{ document.querySelectorAll('#stage-verified [data-verify]').forEach(el=>el.classList.remove('pending'));
+                      document.getElementById('cnt-verified').textContent='7 of 7';
+                      logLine('Full suite re-run: 41/41 passing, 0 regressions.', 'ok-line');
+                      document.getElementById('v-cve').textContent='0';
+                      document.getElementById('v-dead').textContent='0';
+                      document.getElementById('v-open').textContent='2'; }},
+    {t:5800, fn:()=>{ document.getElementById('stage-shipped').classList.remove('pending');
+                      document.getElementById('cnt-shipped').textContent='7 of 7';
+                      document.getElementById('k-cov').textContent='88%';
+                      document.getElementById('v-after').textContent='88%';
+                      logLine('Changelog drafted. Maintenance report ready.', 'ok-line');
+                      runBtn.disabled = false; runBtn.textContent = 'Run again'; }}
+  ];
+  steps.forEach(s=> setTimeout(s.fn, s.t));
+});
+
+/* ---- paste-your-code analyzer ---- */
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  document.getElementById('codeInput').value = '';
+  document.getElementById('analyzerOutput').innerHTML = '<div class="empty">Paste something on the left and press "Analyze code" to see its health score, flagged risks, and a plain-language explanation.</div>';
+});
+
+document.getElementById('analyzeBtn').addEventListener('click', ()=>{
+  const code = document.getElementById('codeInput').value;
+  const out = document.getElementById('analyzerOutput');
+  if(!code.trim()){
+    out.innerHTML = '<div class="empty">Paste some code first — even a short function is enough.</div>';
+    return;
+  }
+
+  let score = 100;
+  const findings = [];
+
+  const secretPattern = /(api[_-]?key|secret|password|token)\s*[:=]\s*['"][^'"]{6,}['"]/i;
+  const hasSecret = secretPattern.test(code);
+  if(hasSecret){ score -= 40; findings.push(['bad','Possible hardcoded secret or credential found']); }
+  else findings.push(['ok','No hardcoded secrets or credentials detected']);
+
+  const hasEval = /\beval\(|new Function\(/.test(code);
+  if(hasEval){ score -= 25; findings.push(['bad','Uses eval() or Function() — arbitrary code execution risk']); }
+
+  const hasInnerHTML = /\.innerHTML\s*=/.test(code);
+  if(hasInnerHTML){ score -= 10; findings.push(['warn','Assigns innerHTML directly — check the source is trusted (XSS risk)']); }
+
+  const todoCount = (code.match(/TODO|FIXME/gi)||[]).length;
+  if(todoCount>0){ score -= Math.min(todoCount*2,10); findings.push(['warn', todoCount+' TODO/FIXME marker'+(todoCount>1?'s':'')+' left in this snippet']); }
+
+  const consoleCount = (code.match(/console\.log/g)||[]).length;
+  if(consoleCount>0){ score -= Math.min(consoleCount,5); findings.push(['warn', consoleCount+' leftover console.log call'+(consoleCount>1?'s':'')]); }
+
+  const hasTryCatch = /try\s*{/.test(code);
+  const looksAsync = /await |\.then\(|fetch\(|axios/.test(code);
+  if(looksAsync && !hasTryCatch){ score -= 10; findings.push(['warn','Async calls found with no try/catch around them']); }
+  else if(hasTryCatch) findings.push(['ok','Error handling present (try/catch found)']);
+
+  score = Math.max(0, Math.min(100, score));
+  const scoreClass = score>=80 ? '' : score>=50 ? 'mid' : 'low';
+  const scoreLabel = score>=80 ? 'Looks healthy' : score>=50 ? 'Worth a second look' : 'Needs attention';
+
+  let lang = document.getElementById('langSelect').value;
+  if(lang==='Auto-detect'){
+    if(/def \w+\(.*\):/.test(code)) lang='Python';
+    else if(/<html|<div|<script/i.test(code)) lang='HTML';
+    else if(/function\s+\w+\(|=>|const |let |import /.test(code)) lang='JavaScript';
+    else lang='code';
+  }
+
+  const lineCount = code.split('\n').length;
+  const funcCount = (code.match(/function\s+\w+|def \w+\(|=>\s*{/g)||[]).length;
+
+  let findingsHTML = findings.map(f=>`<div class="f-item ${f[0]}">${f[0]==='ok'?'✓':f[0]==='warn'?'⚠':'✕'} ${f[1]}</div>`).join('');
+
+  const functionalityText = `This looks like a ${lang} snippet, about ${lineCount} line${lineCount>1?'s':''} long${funcCount?`, with ${funcCount} function${funcCount>1?'s':''} defined`:''}. ${looksAsync ? 'It makes at least one asynchronous call (a fetch, promise, or await).' : 'It runs synchronously — no async calls detected.'}`;
+  const securityText = hasSecret || hasEval || hasInnerHTML
+    ? `This snippet has at least one pattern worth reviewing before shipping: ${[hasSecret&&'a possible hardcoded secret', hasEval&&'use of eval()/Function()', hasInnerHTML&&'a direct innerHTML assignment'].filter(Boolean).join(', ')}.`
+    : `Nothing in the common risk list (hardcoded secrets, eval, unguarded innerHTML) showed up here.`;
+  const beginnerText = `In plain terms: this is a piece of ${lang} code that ${funcCount ? 'defines ' + funcCount + ' step' + (funcCount>1?'s (functions)':' (function)') + ' the program can run' : 'runs top to bottom without separate steps'}. ${looksAsync ? "It waits on something outside itself — like a network request — before finishing." : "It doesn't wait on anything outside itself to finish its job."}`;
+
+  out.innerHTML = `
+    <div class="score-card">
+      <div class="score-num ${scoreClass}">${score}</div>
+      <div><h3>${scoreLabel}</h3><p>Quick static check — not a substitute for a full review.</p></div>
     </div>
-
-    <!-- Active IBM Bob Indicator & Action -->
-    <div class="flex items-center gap-4">
-      <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surfaceLight border border-line text-xs">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 glow-dot animate-pulse"></span>
-        <span class="font-mono text-slate-300">IBM Bob 2.0 Subagent Attached</span>
-      </div>
-      <button onclick="runPreFlightSimulation()" id="simulateBtn" class="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:opacity-90 text-night font-bold px-4 py-2 rounded-lg text-sm transition shadow-md">
-        <span>⚡ Rehearse Cutover</span>
-      </button>
+    <div class="findings-list">${findingsHTML}</div>
+    <div class="accordion">
+      <div class="accordion-item"><div class="acc-head">Functionality <span>▾</span></div><div class="acc-body">${functionalityText}</div></div>
+      <div class="accordion-item"><div class="acc-head">Security <span>▾</span></div><div class="acc-body">${securityText}</div></div>
+      <div class="accordion-item"><div class="acc-head">Beginner-friendly <span>▾</span></div><div class="acc-body">${beginnerText}</div></div>
     </div>
-  </header>
+  `;
+  out.querySelectorAll('.acc-head').forEach(h=>{
+    h.addEventListener('click', ()=> h.parentElement.classList.toggle('open'));
+  });
+  out.querySelector('.accordion-item').classList.add('open');
+});
+</script>
 
-  <!-- MAIN DASHBOARD CONTENT -->
-  <main class="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
-
-    <!-- KPI STATS CARDS ROW -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="p-5 rounded-xl border border-line bg-surface">
-        <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
-          <span>BLAST RADIUS</span>
-          <span class="text-cyan-400">Services</span>
-        </div>
-        <div class="text-3xl font-extrabold text-white mt-2 font-mono" id="kpi-radius">14 Modules</div>
-        <p class="text-xs text-slate-400 mt-1">3 critical paths detected</p>
-      </div>
-
-      <div class="p-5 rounded-xl border border-line bg-surface">
-        <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
-          <span>ROLLOUT DRIFT</span>
-          <span class="text-emerald-400">Env Sync</span>
-        </div>
-        <div class="text-3xl font-extrabold text-emerald-400 mt-2 font-mono" id="kpi-drift">0%</div>
-        <p class="text-xs text-slate-400 mt-1">All secrets matched</p>
-      </div>
-
-      <div class="p-5 rounded-xl border border-line bg-surface">
-        <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
-          <span>MIGRATION SAFETY</span>
-          <span class="text-cyan-400">DB Schema</span>
-        </div>
-        <div class="text-3xl font-extrabold text-white mt-2 font-mono" id="kpi-db">Reversible</div>
-        <p class="text-xs text-slate-400 mt-1">Zero-downtime rollback lock</p>
-      </div>
-
-      <div class="p-5 rounded-xl border border-line bg-surface">
-        <div class="flex justify-between items-center text-xs text-slate-400 font-mono">
-          <span>BOB 2.0 VALIDATION</span>
-          <span class="text-emerald-400">Pass Rate</span>
-        </div>
-        <div class="text-3xl font-extrabold text-cyan-400 mt-2 font-mono" id="kpi-tests">32 / 32</div>
-        <p class="text-xs text-slate-400 mt-1">Pre-flight assertions green</p>
-      </div>
-    </div>
-
-    <!-- CENTER DUAL WORKBENCH -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-      <!-- LEFT: TARGET REPOSITORY & PIPELINE STAGES (7 Cols) -->
-      <div class="lg:col-span-7 space-y-6">
-        
-        <!-- Live Target Release Card -->
-        <div class="p-5 rounded-xl border border-line bg-surface space-y-3">
-          <div class="flex justify-between items-center">
-            <span class="text-xs uppercase font-mono font-bold tracking-wider text-cyan-400">Target Release Artifact</span>
-            <span class="text-xs font-mono text-slate-400">release-candidate/v4.1.0-hotfix</span>
-          </div>
-          <div class="p-3.5 rounded-lg bg-night border border-line flex items-center justify-between font-mono text-xs">
-            <div class="flex items-center gap-3">
-              <span class="text-emerald-400 font-bold">git commit</span>
-              <span class="text-slate-300">d4a97f2 · "Stripe webhook migration & auth policy refactor"</span>
-            </div>
-            <span class="text-slate-500">14 files modified</span>
-          </div>
-        </div>
-
-        <!-- 6-Stage Autonomous Cutover Protocol -->
-        <div class="p-5 rounded-xl border border-line bg-surface space-y-4">
-          <div class="flex justify-between items-center">
-            <h3 class="font-bold text-white text-base">Autonomous Cutover Execution Matrix</h3>
-            <span class="text-xs font-mono text-emerald-400 font-semibold" id="matrixStatus">● Ready to Dry-Run</span>
-          </div>
-
-          <div class="space-y-3 font-mono text-xs" id="stageContainer">
-            <!-- Stage Item 1 -->
-            <div class="p-3.5 rounded-lg bg-surfaceLight border border-line flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <span class="text-cyan-400 font-bold">STAGE 01</span>
-                <div>
-                  <div class="text-white font-bold">AST Dependency & Blast Radius Analysis</div>
-                  <div class="text-slate-400 text-[11px]">Traces call graphs for database pools & authentication gates</div>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">PASSED</span>
-            </div>
-
-            <!-- Stage Item 2 -->
-            <div class="p-3.5 rounded-lg bg-surfaceLight border border-line flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <span class="text-cyan-400 font-bold">STAGE 02</span>
-                <div>
-                  <div class="text-white font-bold">Non-Destructive DB Migration Dry-Run</div>
-                  <div class="text-slate-400 text-[11px]">Verifies idempotency on schema forward & rollback steps</div>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">PASSED</span>
-            </div>
-
-            <!-- Stage Item 3 -->
-            <div class="p-3.5 rounded-lg bg-surfaceLight border border-line flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <span class="text-cyan-400 font-bold">STAGE 03</span>
-                <div>
-                  <div class="text-white font-bold">Runtime Configuration & Secret Guard</div>
-                  <div class="text-slate-400 text-[11px]">Enforces .bobignore zero-credential exposure policy</div>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">PASSED</span>
-            </div>
-
-            <!-- Stage Item 4 -->
-            <div class="p-3.5 rounded-lg bg-surfaceLight border border-line flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <span class="text-cyan-400 font-bold">STAGE 04</span>
-                <div>
-                  <div class="text-white font-bold">Autonomous Bob 2.0 Integration Test Suite</div>
-                  <div class="text-slate-400 text-[11px]">Synthesizes regression suites for newly created paths</div>
-                </div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">PASSED</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- RIGHT: LIVE AUDIT TERMINAL & BOB AGENT FEEDBACK (5 Cols) -->
-      <div class="lg:col-span-5 space-y-6">
-        
-        <!-- Live Terminal Inspector -->
-        <div class="p-5 rounded-xl border border-line bg-surface flex flex-col h-full space-y-3">
-          <div class="flex justify-between items-center border-b border-line pb-2">
-            <span class="font-mono text-xs text-slate-300 flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
-              Bob 2.0 Agent Telemetry
-            </span>
-            <span class="text-[11px] font-mono text-slate-500">pty: ttyS0</span>
-          </div>
-
-          <div id="terminalBody" class="p-4 rounded-lg bg-night border border-line font-mono text-xs text-slate-300 space-y-2 h-72 overflow-y-auto leading-relaxed">
-            <p class="text-slate-500"># Initializing CutoverLens subagent session...</p>
-            <p class="text-cyan-400">[Bob 2.0] Repository context loaded: 48 source files indexed.</p>
-            <p class="text-emerald-400">✓ Blast radius mapping completed without orphan nodes.</p>
-            <p class="text-slate-300">> Checking .env.production against staging schema...</p>
-            <p class="text-emerald-400">✓ Zero credential leakage: .bobignore enforced.</p>
-            <p class="text-slate-400">[Standby] Ready for full pre-flight cutover rehearsal.</p>
-          </div>
-
-          <!-- Remediation & Action Card -->
-          <div class="p-4 rounded-lg bg-surfaceLight border border-line space-y-2">
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-bold text-white">Cutover Decision Gate</span>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">APPROVED FOR RELEASE</span>
-            </div>
-            <p class="text-xs text-slate-400 leading-normal">
-              Autonomous verification confirms all rollback invariants are satisfied. Production deployment will incur 0ms expected downtime.
-            </p>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- COMPARISON STATS FOOTER -->
-    <div class="p-6 rounded-xl border border-line bg-surface grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-      <div>
-        <div class="text-xs font-mono text-slate-400">TRADITIONAL RELEASE AUDIT</div>
-        <div class="text-2xl font-bold text-rose-400 mt-1 font-mono">1.5 - 3 Hours</div>
-        <div class="text-xs text-slate-500 mt-0.5">Manual test check & staging verification</div>
-      </div>
-      <div>
-        <div class="text-xs font-mono text-slate-400">CUTOVERLENS + BOB 2.0</div>
-        <div class="text-2xl font-bold text-emerald-400 mt-1 font-mono">14.2 Seconds</div>
-        <div class="text-xs text-slate-500 mt-0.5">Automated subagent rehearsal</div>
-      </div>
-      <div>
-        <div class="text-xs font-mono text-slate-400">ENGINEERING RISK REDUCTION</div>
-        <div class="text-2xl font-bold text-cyan-400 mt-1 font-mono">98.4%</div>
-        <div class="text-xs text-slate-500 mt-0.5">Zero release rollback incident rate</div>
-      </div>
-    </div>
-
-    <!-- FOOTER SIGNATURE -->
-    <div class="border-t border-line pt-4 flex flex-col sm:flex-row justify-between text-xs text-slate-500 font-mono">
-      <span>CutoverLens · Autonomous SRE & Release Engineering</span>
-      <span>Built for IBM Bob 2.0 Hackathon (Lablab.ai)</span>
-    </div>
-
-  </main>
-
-  <script>
-    function runPreFlightSimulation() {
-      const btn = document.getElementById('simulateBtn');
-      const terminal = document.getElementById('terminalBody');
-      const status = document.getElementById('matrixStatus');
-
-      btn.disabled = true;
-      btn.innerHTML = `<span class="animate-spin">⟳</span> Simulating...`;
-      status.innerText = "● Simulation in progress...";
-      status.className = "text-xs font-mono text-amberAlert font-semibold";
-
-      terminal.innerHTML += `
-        <p class="text-amberAlert mt-2">----------------------------------------</p>
-        <p class="text-amberAlert">> [REHEARSAL] Triggering simulated cutover event...</p>
-      `;
-      terminal.scrollTop = terminal.scrollHeight;
-
-      setTimeout(() => {
-        terminal.innerHTML += `
-          <p class="text-cyan-400">> Simulating synthetic traffic injection (1,000 req/sec)...</p>
-          <p class="text-emerald-400">✓ Database pool healthy: latencies < 12ms.</p>
-        `;
-        terminal.scrollTop = terminal.scrollHeight;
-      }, 700);
-
-      setTimeout(() => {
-        terminal.innerHTML += `
-          <p class="text-cyan-400">> Validating backward compatibility on v4.0 endpoints...</p>
-          <p class="text-emerald-400">✓ All 32 automated verification probes PASSED.</p>
-          <p class="text-emerald-400 font-bold">> [SUCCESS] Ready for zero-downtime release!</p>
-        `;
-        terminal.scrollTop = terminal.scrollHeight;
-        btn.disabled = false;
-        btn.innerHTML = `<span>✓ Rehearsal Complete</span>`;
-        status.innerText = "● Ready to Deploy";
-        status.className = "text-xs font-mono text-emeraldAccent font-semibold";
-      }, 1600);
-    }
-  </script>
 </body>
 </html>
