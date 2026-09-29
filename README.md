@@ -1,4 +1,4 @@
-# 🛠️ Upkeep Console — Autonomous Codebase Maintenance Copilot
+# 🛠️ Upkeep Console  Autonomous Codebase Maintenance Copilot
 
 > **Built with IBM Bob 2.0 for the Lablab.ai IBM Bob 2.0 Hackathon**
 
