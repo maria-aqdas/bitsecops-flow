@@ -4,7 +4,7 @@
 
 Upkeep Console is an autonomous codebase maintenance platform that scans live repositories, triages accumulated technical debt across objective risk-effort matrices, and dispatches parallel Bob 2.0 subagents to resolve safe issues with strict zero-regression test verification.
 
----
+---  
 
 ## ⚡ The Core Problem
 
